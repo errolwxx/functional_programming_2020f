@@ -42,8 +42,9 @@ Functions:
         10. Other: Special trigonometric values
                 tan(pi/2) -> Infinity, sin(2*pi) -> 0, cos(pi/3) -> 0.5
                 Due to features of Double, these special trigonometric values were
-                originally just infinitely approaching the correct value. Function
-                "round1dp" in evaluator part was written to fix this problem.
+                originally just infinitely approaching the correct value. "Round 
+                ParseTree" of datatype ParseTree and Function "round1dp" in evaluator 
+                part were written to fix this problem.
 -}
 
 import Data.Char
