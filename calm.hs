@@ -3,6 +3,7 @@
 -- CNS: t18599xw@sfc.keio.ac.jp
 
 {- 
+** The program supports data type Double rather than only Int **
 Error handling:
         1. "Wrong operation"
                 Operations not allowed in mathematics are handled as wrong operation
