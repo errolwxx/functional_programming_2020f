@@ -40,12 +40,6 @@ Functions:
                 Can be involved in the calculation.
         9. Absolute value: abs
                 abs-10, abs3
-        10. Other: Special trigonometric values
-                tan(pi/2) -> Infinity, sin(2*pi) -> 0, cos(pi/3) -> 0.5
-                Due to features of Double, these special trigonometric values were
-                originally just infinitely approaching the correct value. "Round 
-                ParseTree" of datatype ParseTree and Function "round1dp" in evaluator 
-                part were written to fix this problem.
 -}
 
 import Data.Char
@@ -121,7 +115,6 @@ data ParseTree = Number Double |
                  Sine ParseTree |
                  Cosine ParseTree |
                  Absolute ParseTree |
-                 Round ParseTree |
                  Pai |
                  Euler
                  deriving Show
@@ -139,15 +132,9 @@ parseFactor (Sub:l) = let Value(p1, l1) = parseFactor l in return (Minus (Number
 parseFactor (Sqrt:l) = let Value(p1, l1) = parseFactor l in return (SquareRoot p1, l1)
 parseFactor (Lg:l) = let Value(p1, l1) = parseFactor l in return (CommonLog p1, l1)
 parseFactor (Ln:l) = let Value(p1, l1) = parseFactor l in return (NaturalLog p1, l1)
-parseFactor (Tan:l) = let Value(p1, l1) = parseFactor l 
-                      in if Pi `elem` (reverse $ drop (length(l1)) (reverse l)) then return (Round (Tangent p1), l1)
-                                                                                else return (Tangent p1, l1)
-parseFactor (Sin:l) = let Value(p1, l1) = parseFactor l 
-                      in if Pi `elem` (reverse $ drop (length(l1)) (reverse l)) then return (Round (Sine p1), l1)
-                                                                                else return (Sine p1, l1)
-parseFactor (Cos:l) = let Value(p1, l1) = parseFactor l 
-                      in if Pi `elem` (reverse $ drop (length(l1)) (reverse l)) then return (Round (Cosine p1), l1)
-                                                                                else return (Cosine p1, l1)
+parseFactor (Tan:l) = let Value(p1, l1) = parseFactor l in return (Tangent p1, l1)
+parseFactor (Sin:l) = let Value(p1, l1) = parseFactor l in return (Sine p1, l1)
+parseFactor (Cos:l) = let Value(p1, l1) = parseFactor l in return (Cosine p1, l1)
 parseFactor (Abs:l) = let Value(p1, l1) = parseFactor l in return (Absolute p1, l1)
 parseFactor (LPar:l) = let Value(p1, RPar:l1) = parseExpr l in return (p1, l1)
 parseFactor _ = Error "Parse error"
@@ -201,9 +188,6 @@ parseExpr l = nextTerm $ parseTerm l
         nextTerm x = x
 
 {- evaluator -}
-round1dp :: Double -> Double
-round1dp x = fromIntegral (round $ x * 10) / 10
-
 eval::ParseTree -> MayError Double
 eval (Number x) = Value x
 eval Pai = Value pi
@@ -249,8 +233,6 @@ eval (Cosine p) = do x <- eval p
                      return (cos x)
 eval (Absolute p) = do x <- eval p
                        return (abs x)
-eval (Round p) = do x <- eval p
-                    return (round1dp x)
 
 parse :: [Token] -> MayError ParseTree
 parse ts = do (pt, rs) <- parseExpr ts
